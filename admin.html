@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Attendance System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'DM Sans', sans-serif; }
+    .mono { font-family: 'DM Mono', monospace; }
+    .card-shadow { box-shadow: 6px 6px 0px #1a1a2e; }
+    .btn-shadow { box-shadow: 3px 3px 0px #1a1a2e; }
+    .btn-shadow:active { box-shadow: none; transform: translate(3px, 3px); }
+    .table-shadow { box-shadow: 6px 6px 0px #1a1a2e; }
+  </style>
+</head>
+<body class="min-h-screen bg-[#1a1a2e] p-6">
+
+  <!-- Top bar -->
+  <div class="max-w-6xl mx-auto mb-8 flex items-center justify-between">
+    <div>
+      <div class="inline-block bg-[#4a90d9] text-white px-3 py-0.5 mono text-xs font-medium tracking-widest uppercase mb-2">
+        Admin Panel
+      </div>
+      <h1 class="text-2xl font-semibold text-[#f0ede8] tracking-tight">Attendance Records</h1>
+    </div>
+    <a href="index.html" class="text-xs text-gray-400 mono hover:text-gray-200 transition-colors">← Employee Portal</a>
+  </div>
+
+  <div class="max-w-6xl mx-auto space-y-6">
+
+    <!-- Login card -->
+    <div class="bg-[#f0ede8] border-2 border-[#f0ede8] card-shadow rounded-sm p-6 max-w-md">
+      <h2 class="text-sm font-semibold text-[#1a1a2e] mono uppercase tracking-widest mb-4">Admin Login</h2>
+      <div class="space-y-3">
+        <input
+          id="admin-email"
+          type="email"
+          placeholder="admin@company.com"
+          class="w-full border-2 border-[#1a1a2e] rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4a90d9] bg-white"
+        />
+        <input
+          id="admin-password"
+          type="password"
+          placeholder="••••••••"
+          class="w-full border-2 border-[#1a1a2e] rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4a90d9] bg-white"
+        />
+        <button
+          id="adminLoginBtn"
+          class="w-full bg-[#1a1a2e] text-[#f0ede8] py-2.5 px-4 text-sm font-semibold uppercase tracking-wider rounded-sm btn-shadow transition-all duration-100 hover:bg-[#2e2e4a]"
+        >
+          Login as Admin →
+        </button>
+      </div>
+
+      <!-- Status -->
+      <div id="admin-status" class="hidden mt-4">
+        <div id="admin-status-inner" class="border-2 rounded-sm px-4 py-3 text-sm mono"></div>
+      </div>
+    </div>
+
+    <!-- Attendance table -->
+    <div id="table-section" class="hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-sm font-semibold text-[#f0ede8] mono uppercase tracking-widest">All Records</h2>
+        <button
+          id="refreshBtn"
+          class="text-xs mono text-gray-400 border border-gray-600 px-3 py-1 rounded-sm hover:bg-white/10 transition-colors"
+        >
+          ↻ Refresh
+        </button>
+      </div>
+
+      <div class="overflow-x-auto rounded-sm border-2 border-[#f0ede8] table-shadow">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-[#f0ede8] border-b-2 border-[#1a1a2e]">
+              <th class="text-left px-4 py-3 text-xs mono uppercase tracking-widest text-[#1a1a2e]">Employee</th>
+              <th class="text-left px-4 py-3 text-xs mono uppercase tracking-widest text-[#1a1a2e]">Email</th>
+              <th class="text-left px-4 py-3 text-xs mono uppercase tracking-widest text-[#1a1a2e]">Type</th>
+              <th class="text-left px-4 py-3 text-xs mono uppercase tracking-widest text-[#1a1a2e]">Time</th>
+              <th class="text-left px-4 py-3 text-xs mono uppercase tracking-widest text-[#1a1a2e]">Latitude</th>
+              <th class="text-left px-4 py-3 text-xs mono uppercase tracking-widest text-[#1a1a2e]">Longitude</th>
+            </tr>
+          </thead>
+          <tbody id="attendance-body" class="divide-y divide-white/10 bg-[#12122a]">
+            <!-- rows injected by admin.js -->
+          </tbody>
+        </table>
+        <div id="table-empty" class="hidden bg-[#12122a] text-center py-12 text-gray-500 mono text-sm">
+          No attendance records found.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module" src="admin.js"></script>
+</body>
+</html>
