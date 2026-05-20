@@ -65,9 +65,36 @@
       <!-- Divider -->
       <div class="my-6 border-t-2 border-dashed border-gray-200"></div>
 
+      <!-- Work Description -->
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-[#1a1a2e] mono uppercase tracking-widest mb-3">
+          Last 1 Hour Work Description
+        </label>
+
+        <textarea
+          id="description"
+          rows="4"
+          placeholder="Describe what you completed in the last 1 hour..."
+          class="w-full border-2 border-[#1a1a2e] rounded-sm p-3 text-sm text-[#1a1a2e] bg-white focus:outline-none"
+        ></textarea>
+      </div>
+
+      <!-- Session Counter -->
+      <div class="mb-5">
+        <p
+          id="sessionCounter"
+          class="text-sm font-semibold text-[#1a1a2e] mono uppercase tracking-wide"
+        >
+          Session: 0 / 6
+        </p>
+      </div>
+
       <!-- Attendance Actions -->
       <div>
-        <h2 class="text-sm font-semibold text-[#1a1a2e] mono uppercase tracking-widest mb-5">Mark Attendance</h2>
+        <h2 class="text-sm font-semibold text-[#1a1a2e] mono uppercase tracking-widest mb-5">
+          Mark Attendance
+        </h2>
+
         <div class="grid grid-cols-2 gap-3">
           <button
             id="checkInBtn"
@@ -75,6 +102,7 @@
           >
             ✓ Check In
           </button>
+
           <button
             id="checkOutBtn"
             class="bg-[#e74c3c] border-2 border-[#1a1a2e] text-white py-3 px-4 text-sm font-bold uppercase tracking-wider rounded-sm btn-shadow transition-all duration-100 hover:bg-[#c0392b]"
@@ -82,7 +110,8 @@
             ✗ Check Out
           </button>
         </div>
-      </div>
+      </div>  
+      
 
       <!-- Status message -->
       <div id="status" class="mt-5 hidden">

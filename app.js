@@ -1,5 +1,18 @@
 import { supabase } from './supabaseClient.js';
 
+async function getAddress(lat, lng) {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+    );
+
+    const data = await response.json();
+
+    return data.display_name || 'Address not found';
+  } catch (err) {
+    return 'Unable to fetch address';
+  }
+}
 // ── UI helpers ──────────────────────────────────────────────────────────────
 
 function showStatus(message, type = 'info') {
@@ -78,39 +91,81 @@ async function markAttendance(type) {
         return;
       }
 
-      // 4. Insert the attendance record
-      const { error: insertError } = await supabase
-        .from('attendance')
-        .insert([{
-          employee_id: employee.id,
-          type,
-          timestamp:  new Date().toISOString(),
-          latitude,
-          longitude,
-        }]);
+      // 4. Check today's session count
+        const today = new Date().toISOString().split('T')[0];
 
-      if (insertError) {
-        showStatus(`Failed to record attendance: ${insertError.message}`, 'error');
-        return;
+        const { data: todayRecords, error: todayError } = await supabase
+          .from('attendance')
+          .select('*')
+          .eq('employee_id', employee.id);
+
+        if (todayError) {
+          showStatus('Failed to check today sessions.', 'error');
+          return;
+        }
+
+        const todayCount = todayRecords.filter((record) => {
+          return record.timestamp.startsWith(today);
+        }).length;
+
+        // Maximum 6 sessions
+        if (todayCount >= 6) {
+          showStatus('You already completed all 6 sessions today.', 'error');
+          return;
+        }
+
+        // Update session counter
+        document.getElementById('sessionCounter').innerText =
+          `Session: ${todayCount + 1} / 6`;
+
+        // Get description
+        const description = document.getElementById('description').value.trim();
+
+        // Make description mandatory during checkout
+        if (type === 'checkout' && !description) {
+          showStatus(
+            'Please describe what you worked on in the last hour.',
+            'error'
+          );
+          return;
+        }
+
+        // Convert coordinates to address
+        const address = await getAddress(latitude, longitude);
+
+        // Insert attendance
+        const { error: insertError } = await supabase
+          .from('attendance')
+          .insert({
+            employee_id: employee.id,
+            type,
+            timestamp: new Date().toISOString(),
+            latitude,
+            longitude,
+            address,
+            description,
+            session_number: todayCount + 1
+          });
+
+        if (insertError) {
+          showStatus(
+            `Failed to record attendance: ${insertError.message}`,
+            'error'
+          );
+          return;
+        }
+
+        const label = type === 'checkin'
+          ? 'Check-in'
+          : 'Check-out';
+
+        showStatus(`${label} recorded successfully.`, 'success');
+      },
+      (positionError) => {
+        showStatus('Unable to retrieve your location.', 'error');
       }
-
-      const label = type === 'checkin' ? 'Check-in' : 'Check-out';
-      showStatus(
-        `${label} recorded at ${new Date().toLocaleTimeString()} (${latitude.toFixed(5)}, ${longitude.toFixed(5)})`,
-        'success',
-      );
-    },
-    (err) => {
-      const messages = {
-        1: 'Location permission denied. Please allow location access and try again.',
-        2: 'Location unavailable. Please try again.',
-        3: 'Location request timed out. Please try again.',
-      };
-      showStatus(messages[err.code] || 'Failed to get location.', 'error');
-    },
-    { timeout: 10000 },
-  );
-}
+    );
+  }
 
 // ── Wire up buttons ──────────────────────────────────────────────────────────
 

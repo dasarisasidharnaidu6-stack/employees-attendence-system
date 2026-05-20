@@ -72,8 +72,18 @@ async function loadAttendance() {
 
   const { data: records, error } = await supabase
     .from('attendance')
-    .select('id, type, timestamp, latitude, longitude, employees(name, email)')
-    .order('timestamp', { ascending: false });
+    .select(`
+      id,
+      type,
+      timestamp,
+      latitude,
+      longitude,
+      address,
+      description,
+      session_number,
+      employees(name, email)
+    `)
+    .order('timestamp', { ascending: true });
 
   if (error) {
     tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-red-400 mono text-sm">Error: ${error.message}</td></tr>`;
@@ -92,6 +102,9 @@ async function loadAttendance() {
     const type      = record.type;
     const time      = new Date(record.timestamp).toLocaleString();
     const lat       = record.latitude  != null ? record.latitude.toFixed(6)  : '—';
+    const address = record.address ?? '—';
+    const description = record.description ?? '—';
+    const session = record.session_number ?? '—';
     const lng       = record.longitude != null ? record.longitude.toFixed(6) : '—';
 
     const typeBadge = type === 'checkin'
@@ -103,6 +116,17 @@ async function loadAttendance() {
         <td class="px-4 py-3 text-[#f0ede8] font-medium">${escapeHtml(name)}</td>
         <td class="px-4 py-3 text-gray-300 mono text-xs">${escapeHtml(email)}</td>
         <td class="px-4 py-3">${typeBadge}</td>
+        <td class="px-4 py-3 text-gray-300 mono text-xs">
+          ${session}
+        </td>
+
+        <td class="px-4 py-3 text-gray-300 text-xs max-w-[250px]">
+          ${escapeHtml(description)}
+        </td>
+
+        <td class="px-4 py-3 text-gray-300 text-xs max-w-[300px]">
+          ${escapeHtml(address)}
+        </td>
         <td class="px-4 py-3 text-gray-300 mono text-xs whitespace-nowrap">${time}</td>
         <td class="px-4 py-3 text-gray-300 mono text-xs">${lat}</td>
         <td class="px-4 py-3 text-gray-300 mono text-xs">${lng}</td>
