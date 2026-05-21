@@ -74,6 +74,63 @@
             id="loginBtn"
             class="w-full bg-[#1a1a2e] text-[#f0ede8] py-2.5 px-4 text-sm font-semibold uppercase tracking-wider rounded-sm btn-shadow transition-all duration-100 hover:bg-[#2e2e4a]"
           >
+          <!-- Employee Name Dropdown -->
+          <div>
+            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+              Employee Name
+            </label>
+
+            <select
+              id="employeeName"
+              class="w-full border-2 border-[#1a1a2e] rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4a90d9] bg-[#f9f9f7]"
+            >
+              <option value="">Select Employee</option>
+            </select>
+          </div>
+
+          <!-- Team Dropdown -->
+          <div>
+            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
+              Team Name
+            </label>
+
+            <select
+              id="teamName"
+              class="w-full border-2 border-[#1a1a2e] rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4a90d9] bg-[#f9f9f7]"
+            >
+              <option value="">Select Team</option>
+            </select>
+          </div>
+
+          <!-- Work Mode -->
+          <div>
+            <label class="block text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              Work Mode
+            </label>
+
+            <div class="flex gap-6 mt-2">
+
+              <label class="flex items-center gap-2 text-sm text-[#1a1a2e]">
+                <input
+                  type="radio"
+                  name="workMode"
+                  value="Offline"
+                  checked
+                />
+                Offline
+              </label>
+
+              <label class="flex items-center gap-2 text-sm text-[#1a1a2e]">
+                <input
+                  type="radio"
+                  name="workMode"
+                  value="Remote"
+                />
+                Remote
+              </label>
+
+            </div>
+          </div>
             Login →
           </button>
         </div>

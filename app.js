@@ -1,5 +1,53 @@
 import { supabase } from './supabaseClient.js';
 
+async function loadEmployees() {
+
+  const employeeDropdown =
+    document.getElementById('employeeName');
+
+  const teamDropdown =
+    document.getElementById('teamName');
+
+  const { data, error } = await supabase
+    .from('employees')
+    .select('name, team_name');
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const addedTeams = new Set();
+
+  data.forEach((employee) => {
+
+    // Employee names
+    const option = document.createElement('option');
+
+    option.value = employee.name;
+    option.textContent = employee.name;
+
+    employeeDropdown.appendChild(option);
+
+    // Team names
+    if (
+      employee.team_name &&
+      !addedTeams.has(employee.team_name)
+    ) {
+
+      addedTeams.add(employee.team_name);
+
+      const teamOption =
+        document.createElement('option');
+
+      teamOption.value = employee.team_name;
+      teamOption.textContent = employee.team_name;
+
+      teamDropdown.appendChild(teamOption);
+    }
+  });
+}
+
 async function getAddress(lat, lng) {
   try {
     const response = await fetch(
@@ -117,6 +165,16 @@ async function markAttendance(type) {
         // Update session counter
         document.getElementById('sessionCounter').innerText =
           `Session: ${todayCount + 1} / 6`;
+        const employeeName =
+          document.getElementById('employeeName').value;
+
+        const teamName =
+          document.getElementById('teamName').value;
+
+        const workMode =
+          document.querySelector(
+            'input[name="workMode"]:checked'
+          ).value;
 
         // Get description
         const description = document.getElementById('description').value.trim();
@@ -134,18 +192,22 @@ async function markAttendance(type) {
         const address = await getAddress(latitude, longitude);
 
         // Insert attendance
-        const { error: insertError } = await supabase
-          .from('attendance')
-          .insert({
-            employee_id: employee.id,
-            type,
-            timestamp: new Date().toISOString(),
-            latitude,
-            longitude,
-            address,
-            description,
-            session_number: todayCount + 1
-          });
+        const { error: insertError } =
+          await supabase
+            .from('attendance')
+            .insert({
+              employee_id: employee.id,
+              employee_name: employeeName,
+              team_name: teamName,
+              work_mode: workMode,
+              type,
+              timestamp: new Date().toISOString(),
+              latitude,
+              longitude,
+              address,
+              description,
+              session_number: sessionNumber
+            });
 
         if (insertError) {
           showStatus(
@@ -177,3 +239,4 @@ document.getElementById('checkOutBtn').addEventListener('click', () => markAtten
 document.getElementById('password').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') login();
 });
+loadEmployees();
