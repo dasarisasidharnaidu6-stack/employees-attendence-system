@@ -16,7 +16,41 @@ function showStatus(message, type = 'info') {
   inner.className = `border-2 rounded-sm px-4 py-3 text-sm mono ${styles[type] || styles.info}`;
   inner.textContent = message;
 }
+async function loadTeams() {
 
+  const teamDropdown =
+    document.getElementById('filterTeam');
+
+  const { data, error } = await supabase
+    .from('employees')
+    .select('team_name');
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const addedTeams = new Set();
+
+  data.forEach((employee) => {
+
+    if (
+      employee.team_name &&
+      !addedTeams.has(employee.team_name)
+    ) {
+
+      addedTeams.add(employee.team_name);
+
+      const option =
+        document.createElement('option');
+
+      option.value = employee.team_name;
+      option.textContent = employee.team_name;
+
+      teamDropdown.appendChild(option);
+    }
+  });
+}
 // ── Admin login ──────────────────────────────────────────────────────────────
 
 async function adminLogin() {
@@ -70,7 +104,13 @@ async function loadAttendance() {
   tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400 mono text-sm">Loading…</td></tr>';
   empty.classList.add('hidden');
 
-  const { data: records, error } = await supabase
+  const selectedDate =
+    document.getElementById('filterDate').value;
+
+  const selectedTeam =
+    document.getElementById('filterTeam').value;
+
+  let query = supabase
     .from('attendance')
     .select(`
       id,
@@ -81,9 +121,36 @@ async function loadAttendance() {
       address,
       description,
       session_number,
+      employee_name,
+      team_name,
+      work_mode,
       employees(name, email)
     `)
     .order('timestamp', { ascending: true });
+
+  if (selectedDate) {
+
+    const start =
+      new Date(selectedDate);
+
+    start.setHours(0,0,0,0);
+
+    const end =
+      new Date(selectedDate);
+
+    end.setHours(23,59,59,999);
+
+    query = query
+      .gte('timestamp', start.toISOString())
+      .lte('timestamp', end.toISOString());
+  }
+
+  if (selectedTeam) {
+    query = query.eq('team_name', selectedTeam);
+  }
+
+  const { data: records, error } =
+    await query;
 
   if (error) {
     tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-red-400 mono text-sm">Error: ${error.message}</td></tr>`;
@@ -106,7 +173,8 @@ async function loadAttendance() {
     const description = record.description ?? '—';
     const session = record.session_number ?? '—';
     const lng       = record.longitude != null ? record.longitude.toFixed(6) : '—';
-
+    const team = record.team_name ?? '—';
+    const workMode = record.work_mode ?? '—';
     const typeBadge = type === 'checkin'
       ? '<span class="inline-block bg-[#2ecc71] text-[#1a1a2e] text-xs font-bold mono px-2 py-0.5 rounded-sm uppercase">In</span>'
       : '<span class="inline-block bg-[#e74c3c] text-white text-xs font-bold mono px-2 py-0.5 rounded-sm uppercase">Out</span>';
