@@ -21,6 +21,40 @@ async function loadTeams() {
   const teamDropdown =
     document.getElementById('filterTeam');
 
+  teamDropdown.innerHTML =
+    '<option value="">All Teams</option>';
+
+  const { data, error } = await supabase
+    .from('employees')
+    .select('team_name');
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const uniqueTeams = [
+    ...new Set(
+      data
+        .map(emp => emp.team_name?.trim())
+        .filter(Boolean)
+    )
+  ];
+
+  uniqueTeams.forEach((team) => {
+
+    const option =
+      document.createElement('option');
+
+    option.value = team;
+    option.textContent = team;
+
+    teamDropdown.appendChild(option);
+  });
+}
+  const teamDropdown =
+    document.getElementById('filterTeam');
+
   const { data, error } = await supabase
     .from('employees')
     .select('team_name');
@@ -92,6 +126,7 @@ async function adminLogin() {
 
   showStatus(`Welcome, ${employee.name}! Loading records…`, 'success');
   document.getElementById('table-section').classList.remove('hidden');
+  await loadTeams();
   await loadAttendance();
 }
 
@@ -124,7 +159,7 @@ async function loadAttendance() {
       employee_name,
       team_name,
       work_mode,
-      employees(name, email)
+      employees(name, email,team_name)
     `)
     .order('timestamp', { ascending: true });
 
@@ -183,7 +218,17 @@ async function loadAttendance() {
       <tr class="hover:bg-white/5 transition-colors">
         <td class="px-4 py-3 text-[#f0ede8] font-medium">${escapeHtml(name)}</td>
         <td class="px-4 py-3 text-gray-300 mono text-xs">${escapeHtml(email)}</td>
-        <td class="px-4 py-3">${typeBadge}</td>
+        <td class="px-4 py-3 text-cyan-300 mono text-xs">
+          ${escapeHtml(team)}
+        </td>
+
+        <td class="px-4 py-3 text-yellow-300 mono text-xs">
+          ${escapeHtml(workMode)}
+        </td>
+
+        <td class="px-4 py-3">
+          ${typeBadge}
+        </td>
         <td class="px-4 py-3 text-gray-300 mono text-xs">
           ${session}
         </td>
@@ -217,3 +262,6 @@ document.getElementById('admin-password').addEventListener('keydown', (e) => {
   if (e.key === 'Enter') adminLogin();
 });
 document.getElementById('refreshBtn').addEventListener('click', loadAttendance);
+document.getElementById('filterDate').addEventListener('change', loadAttendance);
+document.getElementById('filterTeam').addEventListener('change', loadAttendance);
+loadTeams();
