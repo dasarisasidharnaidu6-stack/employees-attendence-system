@@ -180,9 +180,6 @@ async function loadAttendance() {
       .lte('timestamp', end.toISOString());
   }
 
-  if (selectedTeam) {
-    query = query.eq('team_name', selectedTeam);
-  }
 
   const { data: records, error } =
     await query;
